@@ -30,6 +30,10 @@ dependencies {
 	compile('com.fasterxml.jackson.dataformat:jackson-dataformat-xml')
 	compile('com.fasterxml.jackson.dataformat:jackson-dataformat-csv')
 	compile('com.opencsv:opencsv:3.7')
+	compile('com.fasterxml.jackson.core:jackson-databind:2.9.4')
+	compile('com.fasterxml.jackson.dataformat:jackson-dataformat-csv')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+
 
