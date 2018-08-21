@@ -18,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -60,13 +61,13 @@ public class ApplicationController {
 	
 	
 	
-	@RequestMapping(value = "/resourcesY", method = RequestMethod.POST, produces = 
+	@RequestMapping(value = "/resources/{index}", method = RequestMethod.POST, produces = 
 		{org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
 		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
 		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
-	public List<Map<String,String>> findSingle() throws Exception {
-		String index = "products";
+	public List<Map<String,String>> findSingle(@PathVariable("index") String index) throws Exception {
+		
 		String resourceUri = "http://localhost:9200/_xpack/sql?format=json&human=true";
 		
 		String queryString = "{\n\t\"query\" : \"SELECT * FROM "+ index +" WHERE product_id='B20'\"\n}";
