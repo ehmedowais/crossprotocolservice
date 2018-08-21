@@ -5,35 +5,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
+import au.com.auspost.crossprotocolservice.dto.GenericResponse;
 import au.com.auspost.crossprotocolservice.util.CSV;
 
 @Controller
+@PropertySource("classpath:application.properties")
 public class ApplicationController {
 	private String csvFile = "/Users/muhammadahmed/work/training/crossprotocolservice/src/main/resources/test.csv";
-
+	@Value("application.elasticsearch.host")
+	private String elasticHost;
+	@Value("application.elasticsearch.port")
+	private String elasticPort;
 	// @GetMapping("/resources/{resource}")
-	@RequestMapping(value = "/resources", method = RequestMethod.GET, produces = 
+	@RequestMapping(value = "/resourcesX", method = RequestMethod.GET, produces = 
 		{org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
 		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
 		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
-//			produces = { 
-//					"application/xml",
-//					"application/json", 
-//					"text/html" 
-//					})
+					
 	@ResponseBody
 	public List<Map<String, String>> getResources() {
 		
@@ -51,7 +57,30 @@ public class ApplicationController {
 		}
 
 	}
-
+	
+	
+	
+	@RequestMapping(value = "/resourcesY", method = RequestMethod.POST, produces = 
+		{org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
+		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
+	@ResponseBody
+	public List<Map<String,String>> findSingle() throws Exception {
+		String index = "products";
+		String resourceUri = "http://localhost:9200/_xpack/sql?format=json&human=true";
+		
+		String queryString = "{\n\t\"query\" : \"SELECT * FROM "+ index +" WHERE product_id='B20'\"\n}";
+		
+		RestTemplate restTemplate = new RestTemplate();
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		
+		HttpEntity<String> request = new HttpEntity<String>(queryString, headers);
+		
+		ResponseEntity<GenericResponse> responseX = restTemplate.postForEntity( resourceUri,  request , GenericResponse.class );
+		return responseX.getBody().getJsonObject();
+	}
 	private List<Map<String, String>> doSomething() throws UnsupportedEncodingException, IOException {
 		try (InputStream in = new FileInputStream(csvFile);) {
 			CSV csv = new CSV(true, ',', in);
