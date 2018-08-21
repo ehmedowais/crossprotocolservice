@@ -31,11 +31,9 @@ import au.com.auspost.crossprotocolservice.util.CSV;
 @PropertySource("classpath:application.properties")
 public class ApplicationController {
 	private String csvFile = "/Users/muhammadahmed/work/training/crossprotocolservice/src/main/resources/test.csv";
-	@Value("application.elasticsearch.host")
-	private String elasticHost;
-	@Value("application.elasticsearch.port")
-	private String elasticPort;
-	// @GetMapping("/resources/{resource}")
+	@Value("${elastic.jdbc.uri}")	
+	private String resourceUri;
+	
 	@RequestMapping(value = "/resourcesX", method = RequestMethod.GET, produces = 
 		{org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
 		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
@@ -68,7 +66,7 @@ public class ApplicationController {
 	@ResponseBody
 	public List<Map<String,String>> findSingle(@PathVariable("index") String index) throws Exception {
 		
-		String resourceUri = "http://localhost:9200/_xpack/sql?format=json&human=true";
+		//String resourceUri = "http://localhost:9200/_xpack/sql?format=json&human=true";
 		
 		String queryString = "{\n\t\"query\" : \"SELECT * FROM "+ index +" WHERE product_id='B20'\"\n}";
 		
