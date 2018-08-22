@@ -40,7 +40,7 @@ public class FileProcessor {
 				elasticSearchDAO.deleteIndex(fileName);
 				int id = 1;
 				while(it.hasNext()) {
-					elasticSearchDAO.update(fileName, fileExtention,""+id++, it.next().toString());
+					elasticSearchDAO.update(fileName, fileExtention,(id++)+"", it.next().toString());
 				}
 				FileUtils.moveFileToDirectory(
 					      FileUtils.getFile(file.getAbsolutePath()), 
