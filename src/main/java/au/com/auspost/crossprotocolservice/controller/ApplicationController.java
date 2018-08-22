@@ -68,7 +68,7 @@ public class ApplicationController {
 		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
 		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
-	public List<Map<String,String>> findSingle(@PathVariable("index") String index, @RequestParam("whereClause") String whereClause) throws Exception {
+	public List<Map<String,String>> findSingle(@PathVariable("index") String index, @RequestParam(name="whereClause", required=false) String whereClause) throws Exception {
 
 		return searchDao.find(index, whereClause);
 	}
