@@ -19,5 +19,10 @@ public class JSONFileReader implements FileReader{
 		ObjectMapper jsonReader = new ObjectMapper();		 
 		return jsonReader.readTree(file);
 	}
-
+	public JsonNode readFileAsJsonNode(File file) throws JsonProcessingException, IOException {
+		// TODO Auto-generated method stub
+				
+		ObjectMapper jsonReader = new ObjectMapper();		 
+		return jsonReader.readTree(file);
+	}
 }
