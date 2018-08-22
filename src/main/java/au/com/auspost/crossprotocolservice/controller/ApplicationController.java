@@ -63,10 +63,10 @@ public class ApplicationController {
 	
 	
 	
-	@RequestMapping(value = "/resources/{index}", method = RequestMethod.POST, produces = 
-		{org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
-		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
-		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
+	@RequestMapping(value = "/resources/{index}", method = RequestMethod.GET, 
+			produces = {org.springframework.http.MediaType.TEXT_PLAIN_VALUE,
+						org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+						org.springframework.http.MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
 	public List<Map<String,String>> findSingle(@PathVariable("index") String index, @RequestParam(name="whereClause", required=false) String whereClause) throws Exception {
 
