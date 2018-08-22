@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
@@ -21,15 +20,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
+import au.com.auspost.crossprotocolservice.dao.ElasticSearchDAO;
 import au.com.auspost.crossprotocolservice.dto.GenericResponse;
 import au.com.auspost.crossprotocolservice.util.CSV;
 
 @Controller
 @PropertySource("classpath:application.properties")
 public class ApplicationController {
+	@Autowired
+	private ElasticSearchDAO searchDao;
+	
 	private String csvFile = "/Users/muhammadahmed/work/training/crossprotocolservice/src/main/resources/test.csv";
 	@Value("${elastic.jdbc.uri}")	
 	private String resourceUri;
@@ -64,21 +68,9 @@ public class ApplicationController {
 		org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
 		org.springframework.http.MediaType.APPLICATION_XML_VALUE})
 	@ResponseBody
-	public List<Map<String,String>> findSingle(@PathVariable("index") String index) throws Exception {
-		
-		//String resourceUri = "http://localhost:9200/_xpack/sql?format=json&human=true";
-		
-		String queryString = "{\n\t\"query\" : \"SELECT * FROM "+ index +" WHERE product_id='B20'\"\n}";
-		
-		RestTemplate restTemplate = new RestTemplate();
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		
-		HttpEntity<String> request = new HttpEntity<String>(queryString, headers);
-		
-		ResponseEntity<GenericResponse> responseX = restTemplate.postForEntity( resourceUri,  request , GenericResponse.class );
-		return responseX.getBody().getJsonObject();
+	public List<Map<String,String>> findSingle(@PathVariable("index") String index, @RequestParam("whereClause") String whereClause) throws Exception {
+
+		return searchDao.find(index, whereClause);
 	}
 	private List<Map<String, String>> doSomething() throws UnsupportedEncodingException, IOException {
 		try (InputStream in = new FileInputStream(csvFile);) {
