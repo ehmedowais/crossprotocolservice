@@ -1,8 +1,11 @@
 package au.com.auspost.crossprotocolservice.config;
 
+import java.net.InetAddress;
+
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,10 +29,9 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
 		TransportClient client = null;
 		try {
 			final Settings elasticsearchSettings = Settings.builder().put("client.transport.sniff", true)
-					.put("path.home", elasticsearchHome).put("cluster.name", clusterName).build();
+					.put("path.home", elasticsearchHome).put("cluster.name", "elasticsearch").build();
 			client = new PreBuiltTransportClient(elasticsearchSettings);
-			// client.addTransportAddress(new
-			// InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

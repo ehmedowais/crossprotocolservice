@@ -10,11 +10,12 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import au.com.auspost.crossprotocolservice.dao.ElasticSearchDAO;
-
+@Component
 public class FileProcessor {
 	
 	@Value("${application.inputDir}")
@@ -37,7 +38,7 @@ public class FileProcessor {
 			try {
 				JsonNode jsonNode = fileReader.readFileAsJsonNode(file);
 				Iterator<JsonNode> it = jsonNode.iterator();
-				elasticSearchDAO.deleteIndex(fileName);
+				//elasticSearchDAO.deleteIndex(fileName);
 				int id = 1;
 				while(it.hasNext()) {
 					elasticSearchDAO.update(fileName, fileExtention,(id++)+"", it.next().toString());
