@@ -11,13 +11,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @EnableWebMvc
+@EnableScheduling
 public class ApplicationConfig extends WebMvcConfigurerAdapter {
+	private final String HOST_IP = "127.0.0.1";
+	private final int PORT = 9300;
 	@Value("${elasticsearch.home:/Users/muhammadahmed/java/elasticsearch-6.3.1}")
 	private String elasticsearchHome;
 
@@ -31,7 +35,7 @@ public class ApplicationConfig extends WebMvcConfigurerAdapter {
 			final Settings elasticsearchSettings = Settings.builder().put("client.transport.sniff", true)
 					.put("path.home", elasticsearchHome).put("cluster.name", "elasticsearch").build();
 			client = new PreBuiltTransportClient(elasticsearchSettings);
-			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+			client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(HOST_IP), PORT));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

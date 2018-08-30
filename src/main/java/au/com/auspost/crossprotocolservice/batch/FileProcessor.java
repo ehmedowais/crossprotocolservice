@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,17 +17,20 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import au.com.auspost.crossprotocolservice.dao.ElasticSearchDAO;
+
 @Component
 public class FileProcessor {
-	
+
 	@Value("${application.inputDir}")
 	private String readFrom;
 	@Value("${application.processedDir}")
 	private String processedDir;
 	@Autowired
 	private ElasticSearchDAO elasticSearchDAO;
-	
-	@Scheduled(fixedRate=500)
+
+	private Logger logger = LoggerFactory.getLogger(FileProcessor.class);
+
+	@Scheduled(fixedRate = 500)
 	public void process() {
 		File inputFolder = new File(readFrom);
 		File[] files = inputFolder.listFiles();
@@ -33,19 +38,25 @@ public class FileProcessor {
 		filesList.forEach(file -> {
 			String fileName = FilenameUtils.getBaseName(file.getName());
 			String fileExtention = FilenameUtils.getExtension(file.getName());
-			
+
 			FileReader fileReader = FileReaderFactory.getInstance(fileExtention);
 			try {
 				JsonNode jsonNode = fileReader.readFileAsJsonNode(file);
 				Iterator<JsonNode> it = jsonNode.iterator();
-				//elasticSearchDAO.deleteIndex(fileName);
-				int id = 1;
-				while(it.hasNext()) {
-					elasticSearchDAO.update(fileName, fileExtention,(id++)+"", it.next().toString());
+				try {
+					elasticSearchDAO.deleteIndex(fileName);
+					logger.info("Index {} deleted successfully", fileName);
+				} catch (Exception ex) {
+					logger.error(ex.getMessage());
 				}
-				FileUtils.moveFileToDirectory(
-					      FileUtils.getFile(file.getAbsolutePath()), 
-					      FileUtils.getFile(processedDir+"/"+file.getName()), true);
+				int id = 1;
+				while (it.hasNext()) {
+					elasticSearchDAO.update(fileName, fileExtention, (id++) + "", it.next().toString());
+				}
+				logger.info("{} processed successfully.................", fileName);
+				FileUtils.moveFile(FileUtils.getFile(file.getAbsolutePath()),
+						FileUtils.getFile(processedDir + "/" + file.getName()));
+				logger.info("{} archived successfully.................", fileName);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
